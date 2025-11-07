@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="slides_files/libs/clipboard/clipboard.min.js"></script>
+<script src="slides_files/libs/quarto-html/tabby.min.js"></script>
+<script src="slides_files/libs/quarto-html/popper.min.js"></script>
+<script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.5.57">
+
+  <meta name="author" content="Matteo Lisi">
+  <title>Building and Customising Statistical Models with Stan and R: An Introduction to Bayesian Inference</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #b2b2b2; background-color: #000000; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #b2b2b2; } /* Normal */
+    code span.al { color: #ff0000; background-color: #3f0000; font-weight: bold; } /* Alert */
+    code span.an { color: #ff00ff; } /* Annotation */
+    code span.at { color: #ffffaf; } /* Attribute */
+    code span.bn { color: #ff8b8b; } /* BaseN */
+    code span.bu { color: #87ffaf; font-weight: bold; } /* BuiltIn */
+    code span.cf { color: #ffff54; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #ff5454; } /* Char */
+    code span.cn { color: #af7f00; font-weight: bold; } /* Constant */
+    code span.co { color: #54ffff; } /* Comment */
+    code span.cv { color: #0095ff; } /* CommentVar */
+    code span.do { color: #e0ffff; } /* Documentation */
+    code span.dt { color: #ffff54; } /* DataType */
+    code span.dv { color: #ff8b8b; } /* DecVal */
+    code span.er { color: #ff5500; text-decoration: underline; } /* Error */
+    code span.ex { color: #0095ff; font-weight: bold; } /* Extension */
+    code span.fl { color: #ff8b8b; } /* Float */
+    code span.fu { color: #cd00cd; } /* Function */
+    code span.im { color: #ff54ff; } /* Import */
+    code span.in { color: #ffaa00; } /* Information */
+    code span.kw { color: #5fd7ff; font-weight: bold; } /* Keyword */
+    code span.op { color: #b2b2b2; } /* Operator */
+    code span.ot { color: #54ff54; } /* Other */
+    code span.pp { color: #87ffaf; } /* Preprocessor */
+    code span.re { color: #0095ff; background-color: #22226d; } /* RegionMarker */
+    code span.sc { color: #0095ff; } /* SpecialChar */
+    code span.ss { color: #ff5500; } /* SpecialString */
+    code span.st { color: #ff54ff; } /* String */
+    code span.va { color: #06989a; } /* Variable */
+    code span.vs { color: #ff54ff; } /* VerbatimString */
+    code span.wa { color: #ff0000; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto.css">
+  <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+
+  .callout {
+    margin-top: 1em;
+    margin-bottom: 1em;  
+    border-radius: .25rem;
+  }
+
+  .callout.callout-style-simple { 
+    padding: 0em 0.5em;
+    border-left: solid #acacac .3rem;
+    border-right: solid 1px silver;
+    border-top: solid 1px silver;
+    border-bottom: solid 1px silver;
+    display: flex;
+  }
+
+  .callout.callout-style-default {
+    border-left: solid #acacac .3rem;
+    border-right: solid 1px silver;
+    border-top: solid 1px silver;
+    border-bottom: solid 1px silver;
+  }
+
+  .callout .callout-body-container {
+    flex-grow: 1;
+  }
+
+  .callout.callout-style-simple .callout-body {
+    font-size: 1rem;
+    font-weight: 400;
+  }
+
+  .callout.callout-style-default .callout-body {
+    font-size: 0.9rem;
+    font-weight: 400;
+  }
+
+  .callout.callout-titled.callout-style-simple .callout-body {
+    margin-top: 0.2em;
+  }
+
+  .callout:not(.callout-titled) .callout-body {
+      display: flex;
+  }
+
+  .callout:not(.no-icon).callout-titled.callout-style-simple .callout-content {
+    padding-left: 1.6em;
+  }
+
+  .callout.callout-titled .callout-header {
+    padding-top: 0.2em;
+    margin-bottom: -0.2em;
+  }
+
+  .callout.callout-titled .callout-title  p {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+  }
+    
+  .callout.callout-titled.callout-style-simple .callout-content  p {
+    margin-top: 0;
+  }
+
+  .callout.callout-titled.callout-style-default .callout-content  p {
+    margin-top: 0.7em;
+  }
+
+  .callout.callout-style-simple div.callout-title {
+    border-bottom: none;
+    font-size: .9rem;
+    font-weight: 600;
+    opacity: 75%;
+  }
+
+  .callout.callout-style-default  div.callout-title {
+    border-bottom: none;
+    font-weight: 600;
+    opacity: 85%;
+    font-size: 0.9rem;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+
+  .callout.callout-style-default div.callout-content {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+
+  .callout.callout-style-simple .callout-icon::before {
+    height: 1rem;
+    width: 1rem;
+    display: inline-block;
+    content: "";
+    background-repeat: no-repeat;
+    background-size: 1rem 1rem;
+  }
+
+  .callout.callout-style-default .callout-icon::before {
+    height: 0.9rem;
+    width: 0.9rem;
+    display: inline-block;
+    content: "";
+    background-repeat: no-repeat;
+    background-size: 0.9rem 0.9rem;
+  }
+
+  .callout-title {
+    display: flex
+  }
+    
+  .callout-icon::before {
+    margin-top: 1rem;
+    padding-right: .5rem;
+  }
+
+  .callout.no-icon::before {
+    display: none !important;
+  }
+
+  .callout.callout-titled .callout-body > .callout-content > :last-child {
+    padding-bottom: 0.5rem;
+    margin-bottom: 0;
+  }
+
+  .callout.callout-titled .callout-icon::before {
+    margin-top: .5rem;
+    padding-right: .5rem;
+  }
+
+  .callout:not(.callout-titled) .callout-icon::before {
+    margin-top: 1rem;
+    padding-right: .5rem;
+  }
+
+  /* Callout Types */
+
+  div.callout-note {
+    border-left-color: #4582ec !important;
+  }
+
+  div.callout-note .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAEU0lEQVRYCcVXTWhcVRQ+586kSUMMxkyaElstCto2SIhitS5Ek8xUKV2poatCcVHtUlFQk8mbaaziwpWgglJwVaquitBOfhQXFlqlzSJpFSpIYyXNjBNiTCck7x2/8/LeNDOZxDuEkgOXe++553zfefee+/OYLOXFk3+1LLrRdiO81yNqZ6K9cG0P3MeFaMIQjXssE8Z1JzLO9ls20MBZX7oG8w9GxB0goaPrW5aNMp1yOZIa7Wv6o2ykpLtmAPs/vrG14Z+6d4jpbSKuhdcSyq9wGMPXjonwmESXrriLzFGOdDBLB8Y6MNYBu0dRokSygMA/mrun8MGFN3behm6VVAwg4WR3i6FvYK1T7MHo9BK7ydH+1uurECoouk5MPRyVSBrBHMYwVobG2aOXM07sWrn5qgB60rc6mcwIDJtQrnrEr44kmy+UO9r0u9O5/YbkS9juQckLed3DyW2XV/qWBBB3ptvI8EUY3I9p/67OW+g967TNr3Sotn3IuVlfMLVnsBwH4fsnebJvyGm5GeIUA3jljERmrv49SizPYuq+z7c2H/jlGC+Ghhupn/hcapqmcudB9jwJ/3jvnvu6vu5lVzF1fXyZuZZ7U8nRmVzytvT+H3kilYvH09mLWrQdwFSsFEsxFVs5fK7A0g8gMZjbif4ACpKbjv7gNGaD8bUrlk8x+KRflttr22JEMRUbTUwwDQScyzPgedQHZT0xnx7ujw2jfVfExwYHwOsDTjLdJ2ebmeQIlJ7neo41s/DrsL3kl+W2lWvAga0tR3zueGr6GL78M3ifH0rGXrBC2aAR8uYcIA5gwV8zIE8onoh8u0Fca/ciF7j1uOzEnqcIm59sEXoGc0+z6+H45V1CvAvHcD7THztu669cnp+L0okAeIc6zjbM/24LgGM1gZk7jnRu1aQWoU9sfUOuhrmtaPIO3YY1KLLWZaEO5TKUbMY5zx8W9UJ6elpLwKXbsaZ4EFl7B4bMtDv0iRipKoDQT2sNQI9b1utXFdYisi+wzZ/ri/1m7QfDgEuvgUUEIJPq3DhX/5DWNqIXDOweC2wvIR90Oq3lDpdMIgD2r0dXvGdsEW5H6x6HLRJYU7C69VefO1x8Gde1ZFSJLfWS1jbCnhtOPxmpfv2LXOA2Xk2tvnwKKPFuZ/oRmwBwqRQDcKNeVQkYcOjtWVBuM/JuYw5b6isojIkYxyYAFn5K7ZBF10fea52y8QltAg6jnMqNHFBmGkQ1j+U43HMi2xMar1Nv0zGsf1s8nUsmUtPOOrbFIR8bHFDMB5zL13Gmr/kGlCkUzedTzzmzsaJXhYawnA3UmARpiYj5ooJZiUoxFRtK3X6pgNPv+IZVPcnwbOl6f+aBaO1CNvPW9n9LmCp01nuSaTRF2YxHqZ8DYQT6WsXT+RD6eUztwYLZ8rM+rcPxamv1VQzFUkzFXvkiVrySGQgJNvXHJAxiU3/NwiC03rSf05VBaPtu/Z7/B8Yn/w7eguloAAAAAElFTkSuQmCC');
+  }
+
+  div.callout-note.callout-style-default .callout-title {
+    background-color: #dae6fb
+  }
+
+  div.callout-important {
+    border-left-color: #d9534f !important;
+  }
+
+  div.callout-important .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAEKklEQVRYCcVXTWhcVRS+575MJym48A+hSRFr00ySRQhURRfd2HYjk2SSTokuBCkU2o0LoSKKraKIBTcuFCoidGFD08nkBzdREbpQ1EDNIv8qSGMFUboImMSZd4/f9zJv8ibJMC8xJQfO3HPPPef7zrvvvnvviIkpC9nsw0UttFunbUhpFzFtarSd6WJkStVMw5xyVqYTvkwfzuf/5FgtkVoB0729j1rjXwThS7Vio+Mo6DNnvLfahoZ+i/o32lULuJ3NNiz7q6+pyAUkJaFF6JwaM2lUJlV0MlnQn5aTRbEu0SEqHUa0A4AdiGuB1kFXRfVyg5d87+Dg4DL6m2TLAub60ilj7A1Ec4odSAc8X95sHh7+ZRPCFo6Fnp7HfU/fBng/hi10CjCnWnJjsxvDNxWw0NfV6Rv5GgP3I3jGWXumdTD/3cbEOP2ZbOZp69yniG3FQ9z1jD7bnBu9Fc2tKGC2q+uAJOQHBDRiZX1x36o7fWBs7J9ownbtO+n0/qWkvW7UPIfc37WgT6ZGR++EOJyeQDSb9UB+DZ1G6DdLDzyS+b/kBCYGsYgJbSQHuThGKRcw5xdeQf8YdNHsc6ePXrlSYMBuSIAFTGAtQo+VuALo4BX83N190NWZWbynBjhOHsmNfFWLeL6v+ynsA58zDvvAC8j5PkbOcXCMg2PZFk3q8MjI7WAG/Dp9AwP7jdGBOOQkAvlFUB+irtm16I1Zw9YBcpGTGXYmk3kQIC/Cds55l+iMI3jqhjAuaoe+am2Jw5GT3Nbz3CkE12NavmzN5+erJW7046n/CH1RO/RVa8lBLozXk9uqykkGAyRXLWlLv5jyp4RFsG5vGVzpDLnIjTWgnRy2Rr+tDKvRc7Y8AyZq10jj8DqXdnIRNtFZb+t/ZRtXcDiVnzpqx8mPcDWxgARUqx0W1QB9MeUZiNrV4qP+Ehc+BpNgATsTX8ozYKL2NtFYAHc84fG7ndxUPr+AR/iQSns7uSUufAymwDOb2+NjK27lEFocm/EE2WpyIy/Hi66MWuMKJn8RvxIcj87IM5Vh9663ziW36kR0HNenXuxmfaD8JC7tfKbrhFr7LiZCrMjrzTeGx+PmkosrkNzW94ObzwocJ7A1HokLolY+AvkTiD/q1H0cN48c5EL8Crkttsa/AXQVDmutfyku0E7jShx49XqV3MFK8IryDhYVbj7Sj2P2eBxwcXoe8T8idsKKPRcnZw1b+slFTubwUwhktrfnAt7J++jwQtLZcm3sr9LQrjRzz6cfMv9aLvgmnAGvpoaGLxM4mAEaLV7iAzQ3oU0IvD5x9ix3yF2RAAuYAOO2f7PEFWCXZ4C9Pb2UsgDeVnFSpbFK7/IWu7TPTvBqzbGdCHOJQSxiEjt6IyZmxQyEJHv6xyQsYk//moVFsN2zP6fRImjfq7/n/wFDguUQFNEwugAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-important.callout-style-default .callout-title {
+    background-color: #f7dddc
+  }
+
+  div.callout-warning {
+    border-left-color: #f0ad4e !important;
+  }
+
+  div.callout-warning .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAETklEQVRYCeVWW2gcVRg+58yaTUnizqbipZeX4uWhBEniBaoUX1Ioze52t7sRq6APio9V9MEaoWlVsFasRq0gltaAPuxms8lu0gcviE/FFOstVbSIxgcv6SU7EZqmdc7v9+9mJtNks51NTUH84ed889/PP+cmxP+d5FIbMJmNbpREu4WUkiTtCicKny0l1pIKmBzovF2S+hIJHX8iEu3hZJ5lNZGqyRrGSIQpq15AzF28jgpeY6yk6GVdrfFqdrD6Iw+QlB8g0YS2g7dyQmXM/IDhBhT0UCiRf59lfqmmDvzRt6kByV/m4JjtzuaujMUM2c5Z2d6JdKrRb3K2q6mA+oYVz8JnDdKPmmNthzkAk/lN63sYPgevrguc72aZX/L9C6x09GYyxBgCX4NlvyGUHOKELlm5rXeR1kchuChJt4SSwyddZRXgvwMGvYo4QSlk3/zkHD8UHxwVJA6zjZZqP8v8kK8OWLnIZtLyCAJagYC4rTGW/9Pqj92N/c+LUaAj27movwbi19tk/whRCIE7Q9vyI6yvRpftAKVTdUjOW40X3h5OXsKCdmFcx0xlLJoSuQngnrJe7Kcjm4OMq9FlC7CMmScQANuNvjfP3PjGXDBaUQmbp296S5L4DrpbrHN1T87ZVEZVCzg1FF0Ft+dKrlLukI+/c9ENo+TvlTDbYFvuKPtQ9+l052rXrgKoWkDAFnvh0wTOmYn8R5f4k/jN/fZiCM1tQx9jQQ4ANhqG4hiL0qIFTGViG9DKB7GYzgubnpofgYRwO+DFjh0Zin2m4b/97EDkXkc+f6xYAPX0KK2I/7fUQuwzuwo/L3AkcjugPNixC8cHf0FyPjWlItmLxWw4Ou9YsQCr5fijMGoD/zpdRy95HRysyXA74MWOnscpO4j2y3HAVisw85hX5+AFBRSHt4ShfLFkIMXTqyKFc46xdzQM6XbAi702a7sy04J0+feReMFKp5q9esYLCqAZYw/k14E/xcLLsFElaornTuJB0svMuJINy8xkIYuL+xPAlWRceH6+HX7THJ0djLUom46zREu7tTkxwmf/FdOZ/sh6Q8qvEAiHpm4PJ4a/doJe0gH1t+aHRgCzOvBvJedEK5OFE5jpm4AGP2a8Dxe3gGJ/pAutug9Gp6he92CsSsWBaEcxGx0FHytmIpuqGkOpldqNYQK8cSoXvd+xLxXADw0kf6UkJNFtdo5MOgaLjiQOQHcn+A6h5NuL2s0qsC2LOM75PcF3yr5STuBSAcGG+meA14K/CI21HcS4LBT6tv0QAh8Dr5l93AhZzG5ZJ4VxAqdZUEl9z7WJ4aN+svMvwHHL21UKTd1mqvChH7/Za5xzXBBKrUcB0TQ+Ulgkfbi/H/YT5EptrGzsEK7tR1B7ln9BBwckYfMiuSqklSznIuoIIOM42MQO+QnduCoFCI0bpkzjCjddHPN/F+2Yu+sd9bKNpVwHhbS3LluK/0zgfwD0xYI5dXuzlQAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-warning.callout-style-default .callout-title {
+    background-color: #fcefdc
+  }
+
+  div.callout-tip {
+    border-left-color: #02b875 !important;
+  }
+
+  div.callout-tip .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAADr0lEQVRYCe1XTWgTQRj9ZjZV8a9SPIkKgj8I1bMHsUWrqYLVg4Ue6v9BwZOxSYsIerFao7UiUryIqJcqgtpimhbBXoSCVxUFe9CTiogUrUp2Pt+3aUI2u5vdNh4dmMzOzHvvezuz8xNFM0mjnbXaNu1MvFWRXkXEyE6aYOYJpdW4IXuA4r0fo8qqSMDBU0v1HJUgVieAXxzCsdE/YJTdFcVIZQNMyhruOMJKXYFoLfIfIvVIMWdsrd+Rpd86ZmyzzjJmLStqRn0v8lzkb4rVIXvnpScOJuAn2ACC65FkPzEdEy4TPWRLJ2h7z4cArXzzaOdKlbOvKKX25Wl00jSnrwVxAg3o4dRxhO13RBSdNvH0xSARv3adTXbBdTf64IWO2vH0LT+cv4GR1DJt+DUItaQogeBX/chhbTBxEiZ6gftlDNXTrvT7co4ub5A6gp9HIcHvzTa46OS5fBeP87Qm0fQkr4FsYgVQ7Qg+ZayaDg9jhg1GkWj8RG6lkeSacrrHgDaxdoBiZPg+NXV/KifMuB6//JmYH4CntVEHy/keA6x4h4CU5oFy8GzrBS18cLJMXcljAKB6INjWsRcuZBWVaS3GDrqB7rdapVIeA+isQ57Eev9eCqzqOa81CY05VLd6SamW2wA2H3SiTbnbSxmzfp7WtKZkqy4mdyAlGx7ennghYf8voqp9cLSgKdqNfa6RdRsAAkPwRuJZNbpByn+RrJi1RXTwdi8RQF6ymDwGMAtZ6TVE+4uoKh+MYkcLsT0Hk8eAienbiGdjJHZTpmNjlbFJNKDVAp2fJlYju6IreQxQ08UJDNYdoLSl6AadO+fFuCQqVMB1NJwPm69T04Wv5WhfcWyfXQB+wXRs1pt+nCknRa0LVzSA/2B+a9+zQJadb7IyyV24YAxKp2Jqs3emZTuNnKxsah+uabKbMk7CbTgJx/zIgQYErIeTKRQ9yD9wxVof5YolPHqaWo7TD6tJlh7jQnK5z2n3+fGdggIOx2kaa2YI9QWarc5Ce1ipNWMKeSG4DysFF52KBmTNMmn5HqCFkwy34rDg05gDwgH3bBi+sgFhN/e8QvRn8kbamCOhgrZ9GJhFDgfcMHzFb6BAtjKpFhzTjwv1KCVuxHvCbsSiEz4CANnj84cwHdFXAbAOJ4LTSAawGWFn5tDhLMYz6nWeU2wJfIhmIJBefcd/A5FWQWGgrWzyORZ3Q6HuV+Jf0Bj+BTX69fm1zWgK7By1YTXchFDORywnfQ7GpzOo6S+qECrsx2ifVQAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-tip.callout-style-default .callout-title {
+    background-color: #ccf1e3
+  }
+
+  div.callout-caution {
+    border-left-color: #fd7e14 !important;
+  }
+
+  div.callout-caution .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAACV0lEQVRYCdVWzWoUQRCuqp2ICBLJXgITZL1EfQDBW/bkzUMUD7klD+ATSHBEfAIfQO+iXsWDxJsHL96EHAwhgzlkg8nBg25XWb0zIb0zs9muYYWkoKeru+vn664fBqElyZNuyh167NXJ8Ut8McjbmEraKHkd7uAnAFku+VWdb3reSmRV8PKSLfZ0Gjn3a6Xlcq9YGb6tADjn+lUfTXtVmaZ1KwBIvFI11rRXlWlatwIAAv2asaa9mlB9wwygiDX26qaw1yYPzFXg2N1GgG0FMF8Oj+VIx7E/03lHx8UhvYyNZLN7BwSPgekXXLribw7w5/c8EF+DBK5idvDVYtEEwMeYefjjLAdEyQ3M9nfOkgnPTEkYU+sxMq0BxNR6jExrAI31H1rzvLEfRIdgcv1XEdj6QTQAS2wtstEALLG1yEZ3QhH6oDX7ExBSFEkFINXH98NTrme5IOaaA7kIfiu2L8A3qhH9zRbukdCqdsA98TdElyeMe5BI8Rs2xHRIsoTSSVFfCFCWGPn9XHb4cdobRIWABNf0add9jakDjQJpJ1bTXOJXnnRXHRf+dNL1ZV1MBRCXhMbaHqGI1JkKIL7+i8uffuP6wVQAzO7+qVEbF6NbS0LJureYcWXUUhH66nLR5rYmva+2tjRFtojkM2aD76HEGAD3tPtKM309FJg5j/K682ywcWJ3PASCcycH/22u+Bh7Aa0ehM2Fu4z0SAE81HF9RkB21c5bEn4Dzw+/qNOyXr3DCTQDMBOdhi4nAgiFDGCinIa2owCEChUwD8qzd03PG+qdW/4fDzjUMcE1ZpIAAAAASUVORK5CYII=');
+  }
+
+  div.callout-caution.callout-style-default .callout-title {
+    background-color: #ffe5d0
+  }
+
+  </style>
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+  <script src="slides_files/libs/kePrint-0.0.1/kePrint.js"></script>
+  <link href="slides_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Building and Customising Statistical Models with Stan and R: An Introduction to Bayesian Inference</h1>
+  <p class="subtitle"><br><em>Workshops for Ukraine</em><br></p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Matteo Lisi 
+</div>
+</div>
+</div>
+
+</section>
+<section id="section" class="slide level2 small-font">
+<h2></h2>
+<div class="columns">
+<div class="column" style="width:60%;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="img/test_map.png" style="width:90.0%"></p>
+<figcaption>from ‘Statistical rethinking’, Richard McElreath</figcaption>
+</figure>
+</div>
+</div><div class="column" style="width:40%;">
+<div class="fragment">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="img/meme_leaving.png" class="quarto-figure quarto-figure-center" style="width:90.0%"></p>
+</figure>
+</div>
+</div>
+</div></div>
+</section>
+<section id="outline" class="slide level2">
+<h2>Outline</h2>
+<div>
+<ol type="1">
+<li class="fragment">How to fit a model to data: frequentist &amp; Bayesian approaches</li>
+<li class="fragment">Computations in Bayesian inference &amp; MCMC sampling</li>
+<li class="fragment">Examples</li>
+<li class="fragment">Bayes factors</li>
+</ol>
+</div>
+</section>
+<section id="fitting-a-model-frequentist-approach" class="slide level2">
+<h2>Fitting a model: frequentist approach</h2>
+<div>
+<ul>
+<li class="fragment">Maximum likelihood estimation (MLE)</li>
+<li class="fragment"><strong>Likelihood function</strong>: a function that gives the probability of the data, given some parameter values.</li>
+</ul>
+</div>
+</section>
+<section id="mle-in-linear-regression" class="slide level2">
+<h2>MLE in linear regression</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p>The best-fitting line in linear regression minimizes the sum of squared residuals (errors).</p>
+</div><div class="column" style="width:50%;">
+<p>Equivalent to maximizing the probability of the data assuming errors have a Gaussian distribution.</p>
+</div></div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="slides_files/figure-revealjs/unnamed-chunk-1-1.svg" class="quarto-figure quarto-figure-center" style="width:90.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="likelihood-function" class="slide level2">
+<h2>Likelihood function</h2>
+<ul>
+<li class="fragment"><p>Defined as the probability of the data as a function of the parameters, usually notated as <span class="math inline">\(p(\text{data} \mid \text{parameters})\)</span>.</p></li>
+<li class="fragment"><p>For a simple linear regression <span class="math display">\[y_i= \beta_0 + \beta_1x_i+\epsilon_i\]</span> <span class="math display">\[\epsilon_i \sim \mathcal{N}(0, \sigma^2)\]</span> the likelihood is <span class="math display">\[p(\underbrace{y, x}_{\text{data}} \mid \underbrace{\beta_0, \beta_1, \sigma^2}_{\text{parameters}} ) = \underbrace{\prod_{i=1}^{n}}_{\text{product}} \,\, \underbrace{\mathcal{N}(\overbrace{\beta_0 + \beta_1 x_i}^{\text{predicted value}}\,\,,\,\,\, \sigma^2)}_{\text{Gaussian probability density}}\]</span></p></li>
+</ul>
+</section>
+<section id="likelihood-function-1" class="slide level2">
+<h2>Likelihood function</h2>
+<p>In practice, we usually work with the logarithm of the likelihood function (<em>log-likelihood</em>)</p>
+<p><br></p>
+<p><span class="math display">\[\begin{align}
+\mathcal{L}(y, x \mid \beta_0, \beta_1, \sigma^2 )  &amp; = \log \left[ L(y, x \mid \beta_0, \beta_1, \sigma^2)  \right]\\
+  = -\frac{n}{2}\log(2\pi) &amp; - \frac{n}{2}\log(\sigma^2) - \frac{1}{2\sigma^2} \underbrace{\sum_{i=1}^n \left( y_i - \beta_0 - \beta_1 x_i\right)^2}_{\text{sum of squared residual errors}}\\
+\end{align}\]</span></p>
+<ul>
+<li class="fragment"><span style="color:#800080"><strong>The values of intercept <span class="math inline">\(\beta_0\)</span> and slope <span class="math inline">\(\beta_1\)</span> that minimize the sum of squared residuals also maximize the (log) likelihood function.</strong></span></li>
+</ul>
+</section>
+<section id="the-frequentist-approach" class="slide level2">
+<h2>The <em>frequentist</em> approach</h2>
+<ul>
+<li class="fragment">Maximum likelihood estimation forms the backbone of statistical estimation in frequentist inference.</li>
+<li class="fragment">Key principles of frequentist inference:
+<ul>
+<li class="fragment">Parameters are treated as unknown but <em>fixed</em> quantities.</li>
+<li class="fragment">The goal is to obtain the best point estimates for these parameters.</li>
+<li class="fragment">Probabilities are not used to quantify uncertainty about parameter values.</li>
+<li class="fragment">Uncertainty in estimates is assessed with respect to hypothetical repetitions of the <em>same experiment</em> (as in the definition of a confidence interval).</li>
+<li class="fragment">Probability is interpreted as the <em>long-run frequency</em> of an event across an infinite series of repeated trials or samples.</li>
+</ul></li>
+</ul>
+</section>
+<section id="the-bayesian-approach" class="slide level2">
+<h2>The <em>Bayesian</em> approach</h2>
+<ul>
+<li class="fragment">Probability expresses a <em>degree of belief</em> or confidence in an event or proposition.</li>
+<li class="fragment">Parameters are treated as random variables with uncertainty described by a <em>prior</em> distribution.</li>
+<li class="fragment">Observed data are used to update this prior, producing a <em>posterior</em> distribution.</li>
+<li class="fragment">Bayes’ theorem formalizes this update, but the Bayesian approach is not defined by the theorem itself—it follows naturally from the axioms of probability.</li>
+<li class="fragment"><em>“The essential characteristic of Bayesian methods is their explicit use of probability to quantify uncertainty in inferences based on statistical analysis.”</em> (Gelman et al., 2013)</li>
+</ul>
+</section>
+<section id="elements-of-a-bayesian-model" class="slide level2">
+<h2>Elements of a Bayesian model</h2>
+<p>In a Bayesian setting we have:</p>
+<ul>
+<li class="fragment"><p><span style="color:#800080"><strong>likelihood</strong> <span class="math inline">\(p\left(\text{data} \mid \theta\right)\)</span></span>, giving probability of the data conditional on the parameter(s) <span class="math inline">\(\theta\)</span>;</p></li>
+<li class="fragment"><p><span style="color:#800080"><strong>prior</strong> <span class="math inline">\(p\left(\theta\right)\)</span></span>, which formalizes <em>a-priori</em> belief about the plausibility of parameter values</p></li>
+<li class="fragment"><p><span style="color:#800080"><strong>posterior</strong></span> distribution, obtained by applying Bayes theorem: <span style="color:#800080"><span class="math display">\[p\left(\theta \mid \text{data}\right) = \frac{p\left(\text{data} \mid \theta\right)  p\left(\theta\right)}{p\left( \text{data} \right)}\]</span></span></p></li>
+</ul>
+</section>
+<section id="elements-of-a-bayesian-model-1" class="slide level2">
+<h2>Elements of a Bayesian model</h2>
+<p>In a Bayesian setting we have:</p>
+<div>
+<ul>
+<li><p><span style="color:#800080"><strong>likelihood</strong> <span class="math inline">\(p\left(\text{data} \mid \theta\right)\)</span></span>, giving probability of the data conditional on the parameter(s) <span class="math inline">\(\theta\)</span>;</p></li>
+<li><p><span style="color:#800080"><strong>prior</strong> <span class="math inline">\(p\left(\theta\right)\)</span></span>, which formalizes <em>a-priori</em> belief about the plausibility of parameter values</p></li>
+<li><p><span style="color:#800080"><strong>posterior</strong></span> distribution, obtained by applying Bayes theorem: <span style="color:#800080"><span class="math display">\[p\left(\theta \mid \text{data}\right) = \frac{p\left(\text{data} \mid \theta\right)p\left(\theta\right)}{\int p\left( \text{data} \mid \theta \right) p\left(\theta\right) d\theta}\]</span></span></p></li>
+</ul>
+</div>
+</section>
+<section id="elements-of-a-bayesian-model-2" class="slide level2">
+<h2>Elements of a Bayesian model</h2>
+<p>In a Bayesian setting we have:</p>
+<div>
+<ul>
+<li><p><span style="color:#800080"><strong>likelihood</strong> <span class="math inline">\(p\left(\text{data} \mid \theta\right)\)</span></span>, giving probability of the data conditional on the parameter(s) <span class="math inline">\(\theta\)</span>;</p></li>
+<li><p><span style="color:#800080"><strong>prior</strong> <span class="math inline">\(p\left(\theta\right)\)</span></span>, which formalizes <em>a-priori</em> belief about the plausibility of parameter values</p></li>
+<li><p><span style="color:#800080"><strong>posterior</strong></span> distribution, obtained by applying Bayes theorem: <span style="color:#800080"><span class="math display">\[\text{posterior} = \frac{\text{likelihood} \times \text{prior}}{\text{average likelihood}}\]</span></span></p></li>
+</ul>
+</div>
+</section>
+<section id="elements-of-a-bayesian-model-3" class="slide level2">
+<h2>Elements of a Bayesian model</h2>
+<p>In a Bayesian setting we have:</p>
+<div>
+<ul>
+<li><p><span style="color:#800080"><strong>likelihood</strong> <span class="math inline">\(p\left(\text{data} \mid \theta\right)\)</span></span>, giving probability of the data conditional on the parameter(s) <span class="math inline">\(\theta\)</span>;</p></li>
+<li><p><span style="color:#800080"><strong>prior</strong> <span class="math inline">\(p\left(\theta\right)\)</span></span>, which formalizes <em>a-priori</em> belief about the plausibility of parameter values</p></li>
+<li><p><span style="color:#800080"><strong>posterior</strong></span> distribution, obtained by applying Bayes theorem: <span style="color:#800080"><span class="math display">\[\text{posterior} \propto \text{likelihood} \times \text{prior}\]</span></span></p></li>
+</ul>
+</div>
+</section>
+<section id="bayesian-inference" class="slide level2">
+<h2>Bayesian inference</h2>
+<ul>
+<li class="fragment"><p>To study a specific parameter (e.g.&nbsp;the slope <span class="math inline">\(\beta_1\)</span>), we look at its <em>marginal posterior distribution</em>.</p></li>
+<li class="fragment"><p>This is obtained by averaging over the other parameters: <span class="math display">\[p(\beta_1 \mid \text{data}) = \int \int p(\beta_1, \beta_0, \sigma \mid \text{data}), d\beta_0, d\sigma.\]</span></p></li>
+<li class="fragment"><p>For complex models, this integration is done efficiently using <strong>Markov Chain Monte Carlo (MCMC)</strong> sampling.</p></li>
+<li class="fragment"><p>MCMC yields samples from the posterior; summarizing the marginal posterior then reduces to counting these samples.</p></li>
+</ul>
+</section>
+<section id="metropolis-example" class="slide level2 inverse" data-background-color="#202A30" data-transition="slide">
+<h2>Metropolis example</h2>
+<p>&nbsp;</p>
+<p>Say you want to sample from a probability distribution <span class="math inline">\(p({\bf x})\)</span> (e.g.&nbsp;the posterior), but you can only evaluate a function <span class="math inline">\(f({\bf x})\)</span> that is proportional to the density <span class="math inline">\(p({\bf x})\)</span> (e.g.&nbsp;the product of prior and likelihood).</p>
+<ul>
+<li class="fragment"><p><strong>Initialization</strong>:</p>
+<ol type="1">
+<li class="fragment"><p>choose arbitrary starting point <span class="math inline">\({\bf x}_0\)</span></p></li>
+<li class="fragment"><p>choose a probability distribution to generate proposals <span class="math inline">\(g({\bf x}_{n+1}|{\bf x}_n)\)</span> (<em>proposal density</em>)</p></li>
+</ol></li>
+<li class="fragment"><p><strong>For each iteration <span class="math inline">\(i\)</span></strong>:</p>
+<ol type="1">
+<li class="fragment"><p>generate a candidate <span class="math inline">\({\bf x'}\)</span> sampling from <span class="math inline">\(g({\bf x}_{i+1}|{\bf x}_{i})\)</span></p></li>
+<li class="fragment"><p>calculate the .purple[acceptance ratio] <span class="math inline">\(a = \frac{f({\bf x}')}{f({\bf x}_{i})}\)</span></p></li>
+<li class="fragment"><p>.purple[accept/reject]: generate a uniform number <span class="math inline">\(u\)</span> in <span class="math inline">\([0,1]\)</span></p></li>
+</ol>
+<ul>
+<li class="fragment"><p>if <span class="math inline">\(u \le a\)</span>, accept and set <span class="math inline">\({\bf x}_{i+1}={\bf x'}\)</span> (<em>“move to the new value”</em>)</p></li>
+<li class="fragment"><p>if <span class="math inline">\(u &gt; a\)</span>, reject and set <span class="math inline">\({\bf x}_{i+1}={\bf x}_{i}\)</span> (<em>“stay where you are”</em>)</p></li>
+</ul></li>
+</ul>
+</section>
+<section id="metropolis-example-1" class="slide level2 inverse" data-background-color="#202A30" data-transition="slide">
+<h2>Metropolis example</h2>
+<p>&nbsp;</p>
+<p>Implementing Metropolis algorithm to fit regression for one participant of the dataset <code>sleepstudy</code> (from the <code>lme4</code> package).</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="slides_files/figure-revealjs/unnamed-chunk-2-1.svg" class="quarto-figure quarto-figure-center" style="width:30.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="metropolis-example-2" class="slide level2 inverse" data-background-color="#202A30" data-transition="slide">
+<h2>Metropolis example</h2>
+<p>&nbsp;</p>
+<p>Custom function to compute the log likelihood, holding the data fixed.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> sleepstudy<span class="sc">$</span>Days[sleepstudy<span class="sc">$</span>Subject<span class="sc">==</span><span class="st">"308"</span>]</span>
+<span id="cb1-2"><a href="" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> sleepstudy<span class="sc">$</span>Reaction[sleepstudy<span class="sc">$</span>Subject<span class="sc">==</span><span class="st">"308"</span>]</span>
+<span id="cb1-3"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="" aria-hidden="true" tabindex="-1"></a>loglik <span class="ot">&lt;-</span> <span class="cf">function</span>(par){</span>
+<span id="cb1-5"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="co"># parameter vector = [intercept, slope, log(SD)]</span></span>
+<span id="cb1-6"><a href="" aria-hidden="true" tabindex="-1"></a>  pred <span class="ot">&lt;-</span> par[<span class="dv">1</span>] <span class="sc">+</span> par[<span class="dv">2</span>]<span class="sc">*</span>x</span>
+<span id="cb1-7"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">sum</span>(<span class="fu">dnorm</span>(y, <span class="at">mean =</span> pred, <span class="at">sd =</span> <span class="fu">exp</span>(par[<span class="dv">3</span>]), <span class="at">log =</span> <span class="cn">TRUE</span>))) </span>
+<span id="cb1-8"><a href="" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="metropolis-example-3" class="slide level2 inverse" data-background-color="#202A30">
+<h2>Metropolis example</h2>
+<p>&nbsp;</p>
+<p>Prior distribution about parameter values</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="slides_files/figure-revealjs/unnamed-chunk-4-1.svg" class="quarto-figure quarto-figure-center" style="width:85.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="metropolis-example-4" class="slide level2 inverse" data-background-color="#202A30">
+<h2>Metropolis example</h2>
+<p>&nbsp;</p>
+<p>Prior distribution about parameter values</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="slides_files/figure-revealjs/unnamed-chunk-5-1.svg" class="quarto-figure quarto-figure-center" style="width:85.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="metropolis-example-5" class="slide level2 inverse" data-background-color="#202A30" data-transition="slide">
+<h2>Metropolis example</h2>
+<p>&nbsp;</p>
+<p>Custom function that compute the joint prior log-probability</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="" aria-hidden="true" tabindex="-1"></a>logprior <span class="ot">&lt;-</span> <span class="cf">function</span>(par){</span>
+<span id="cb2-2"><a href="" aria-hidden="true" tabindex="-1"></a>  intercept_prior <span class="ot">&lt;-</span> <span class="fu">dnorm</span>(par[<span class="dv">1</span>], <span class="at">mean=</span><span class="dv">250</span>, <span class="at">sd=</span><span class="dv">180</span>, <span class="at">log=</span><span class="cn">TRUE</span>)</span>
+<span id="cb2-3"><a href="" aria-hidden="true" tabindex="-1"></a>  slope_prior <span class="ot">&lt;-</span> <span class="fu">dnorm</span>(par[<span class="dv">2</span>], <span class="at">mean=</span><span class="dv">20</span>, <span class="at">sd=</span><span class="dv">20</span>, <span class="at">log=</span><span class="cn">TRUE</span>)</span>
+<span id="cb2-4"><a href="" aria-hidden="true" tabindex="-1"></a>  sd_prior <span class="ot">&lt;-</span> <span class="fu">dnorm</span>(par[<span class="dv">3</span>],<span class="at">mean=</span><span class="dv">4</span>, <span class="at">sd=</span><span class="dv">1</span>, <span class="at">log=</span><span class="cn">TRUE</span>)</span>
+<span id="cb2-5"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(intercept_prior <span class="sc">+</span> slope_prior <span class="sc">+</span> sd_prior)</span>
+<span id="cb2-6"><a href="" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div style="font-size: 55%;">
+<p>Note: logarithm transform a product into a sum: <span class="math inline">\(\log(x \times y) = \log(x) + \log(y)\)</span></p>
+</div>
+<p>&nbsp; &nbsp; &nbsp;</p>
+<div class="fragment">
+<p>Add log-likelihood and log-prior to obtain the log posterior (un-normalised)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="" aria-hidden="true" tabindex="-1"></a>logposterior <span class="ot">&lt;-</span> <span class="cf">function</span>(par){</span>
+<span id="cb3-2"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> (<span class="fu">loglik</span>(par) <span class="sc">+</span> <span class="fu">logprior</span>(par))</span>
+<span id="cb3-3"><a href="" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</section>
+<section id="metropolis-example-6" class="slide level2 inverse" data-background-color="#202A30" data-transition="slide">
+<h2>Metropolis example</h2>
+<p>&nbsp; Choose the arbitrary starting point and the proposal density <span class="math inline">\(g({\bf x}_{n+1}|{\bf x}_n)\)</span></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># initial parameters</span></span>
+<span id="cb4-2"><a href="" aria-hidden="true" tabindex="-1"></a>startvalue <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">250</span>, <span class="dv">20</span>, <span class="dv">5</span>) <span class="co">#  [intercept, slope, log(SD)]</span></span>
+<span id="cb4-3"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># proposal density (multivariate normal)</span></span>
+<span id="cb4-5"><a href="" aria-hidden="true" tabindex="-1"></a>proposalfunction <span class="ot">&lt;-</span> <span class="cf">function</span>(par){</span>
+<span id="cb4-6"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">rnorm</span>(<span class="dv">3</span>, <span class="at">mean =</span> par, <span class="at">sd=</span> <span class="fu">c</span>(<span class="dv">15</span>,<span class="dv">5</span>,<span class="fl">0.2</span>)))</span>
+<span id="cb4-7"><a href="" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="metropolis-example-7" class="slide level2 inverse" data-background-color="#202A30" data-transition="slide">
+<h2>Metropolis example</h2>
+<p>&nbsp;</p>
+<p>Another function to run sampling steps for a given number of iterations</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="" aria-hidden="true" tabindex="-1"></a>run_metropolis_MCMC <span class="ot">&lt;-</span> <span class="cf">function</span>(startvalue, iterations){</span>
+<span id="cb5-2"><a href="" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-3"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="co"># set up an empty array to store sampled values</span></span>
+<span id="cb5-4"><a href="" aria-hidden="true" tabindex="-1"></a>  chain <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="at">dim =</span> <span class="fu">c</span>(iterations<span class="sc">+</span><span class="dv">1</span>,<span class="dv">3</span>))</span>
+<span id="cb5-5"><a href="" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-6"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="co"># put starting values at top of arrays</span></span>
+<span id="cb5-7"><a href="" aria-hidden="true" tabindex="-1"></a>  chain[<span class="dv">1</span>,] <span class="ot">&lt;-</span> startvalue</span>
+<span id="cb5-8"><a href="" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-9"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>iterations){</span>
+<span id="cb5-10"><a href="" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-11"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="co"># draw a random proposal</span></span>
+<span id="cb5-12"><a href="" aria-hidden="true" tabindex="-1"></a>    proposal <span class="ot">&lt;-</span> <span class="fu">proposalfunction</span>(chain[i,])</span>
+<span id="cb5-13"><a href="" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-14"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ratio of posterior density between new and old values</span></span>
+<span id="cb5-15"><a href="" aria-hidden="true" tabindex="-1"></a>    a <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">logposterior</span>(proposal) <span class="sc">-</span> <span class="fu">logposterior</span>(chain[i,]))</span>
+<span id="cb5-16"><a href="" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-17"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="co"># sample random number &amp; accept/reject the parameter values</span></span>
+<span id="cb5-18"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">runif</span>(<span class="dv">1</span>) <span class="sc">&lt;</span> a){</span>
+<span id="cb5-19"><a href="" aria-hidden="true" tabindex="-1"></a>      chain[i<span class="sc">+</span><span class="dv">1</span>,] <span class="ot">&lt;-</span> proposal</span>
+<span id="cb5-20"><a href="" aria-hidden="true" tabindex="-1"></a>    }<span class="cf">else</span>{</span>
+<span id="cb5-21"><a href="" aria-hidden="true" tabindex="-1"></a>      chain[i<span class="sc">+</span><span class="dv">1</span>,] <span class="ot">&lt;-</span> chain[i,]</span>
+<span id="cb5-22"><a href="" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb5-23"><a href="" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-24"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(chain)</span>
+<span id="cb5-25"><a href="" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="metropolis-example-8" class="slide level2 inverse" data-background-color="#202A30" data-transition="slide">
+<h2>Metropolis example</h2>
+<p>&nbsp;</p>
+<p>Run sampling for many iterations</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="" aria-hidden="true" tabindex="-1"></a>chain <span class="ot">&lt;-</span> <span class="fu">run_metropolis_MCMC</span>(startvalue, <span class="dv">20000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>&nbsp; &nbsp; &nbsp;</p>
+<p>Output:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(chain)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>         [,1]     [,2]     [,3]
+[1,] 250.0000 20.00000 5.000000
+[2,] 252.4293 19.05077 4.952470
+[3,] 265.2094 17.19395 5.152875
+[4,] 265.2094 17.19395 5.152875
+[5,] 275.4176 15.52590 5.177332
+[6,] 275.4176 15.52590 5.177332</code></pre>
+</div>
+</div>
+</section>
+<section id="metropolis-example-9" class="slide level2 inverse" data-background-color="#202A30" data-transition="slide">
+<h2>Metropolis example</h2>
+<p>&nbsp;</p>
+<p>Results:</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="slides_files/figure-revealjs/unnamed-chunk-13-1.png" class="quarto-figure quarto-figure-center" style="width:85.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="metropolis-example-10" class="slide level2 inverse" data-background-color="#202A30" data-transition="slide">
+<h2>Metropolis example</h2>
+<p>&nbsp;</p>
+<p>With posterior sample, summarising uncertainty is simply a matter of counting values.</p>
+<p>We can calculate a 95% Bayesian credible interval for slope by taking the 2.5th and 97.5th percentiles of posterior samples</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># remove initial 'burn in' samples</span></span>
+<span id="cb9-2"><a href="" aria-hidden="true" tabindex="-1"></a>burnIn <span class="ot">&lt;-</span> <span class="dv">5000</span></span>
+<span id="cb9-3"><a href="" aria-hidden="true" tabindex="-1"></a>slope_samples <span class="ot">&lt;-</span> chain[<span class="sc">-</span>(<span class="dv">1</span><span class="sc">:</span>burnIn),<span class="dv">2</span>]</span>
+<span id="cb9-4"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># mean of posterior distribution</span></span>
+<span id="cb9-6"><a href="" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(slope_samples)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 21.49595</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># 95% Bayesian credible interval</span></span>
+<span id="cb11-2"><a href="" aria-hidden="true" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> <span class="fl">0.05</span></span>
+<span id="cb11-3"><a href="" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">c</span>(<span class="fu">quantile</span>(slope_samples, <span class="at">probs =</span> alpha<span class="sc">/</span><span class="dv">2</span>),</span>
+<span id="cb11-4"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="fu">quantile</span>(slope_samples, <span class="at">probs =</span> <span class="dv">1</span><span class="sc">-</span>alpha<span class="sc">/</span><span class="dv">2</span>)),</span>
+<span id="cb11-5"><a href="" aria-hidden="true" tabindex="-1"></a>      <span class="at">digits=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> 2.5% 97.5% 
+ 8.95 32.51 </code></pre>
+</div>
+</div>
+</section>
+<section id="mcmc-sampling" class="slide level2">
+<h2>MCMC sampling</h2>
+<ul>
+<li class="fragment"><p>The Metropolis algorithm is the ancestor of modern MCMC methods for sampling from unknown posterior distributions.</p></li>
+<li class="fragment"><p>Modern algorithms are more <em>efficient</em>, using smarter proposal strategies to explore the posterior with fewer samples.</p></li>
+<li class="fragment"><p>A state-of-the-art algorithm is Hamiltonian Monte Carlo (HMC), implemented in Stan (<a href="http://mc-stan.org/">mc-stan.org</a>).</p></li>
+<li class="fragment"><p>Stan (named after Stanislaw Ulam, 1909-1984, co-inventor of MCMC methods) is a probabilistic programming language that makes it easy to do Bayesian inference on complex models.</p></li>
+<li class="fragment"><p>Once a model is defined, Stan compiles a C++ program that uses HMC to draw samples from the posterior.</p></li>
+<li class="fragment"><p>Stan is free, open-source, and well-documented, with interfaces for R, Python, Matlab, and Mathematica.</p></li>
+</ul>
+</section>
+<section id="stan-examples" class="slide level2">
+<h2>Stan examples</h2>
+<ol type="1">
+<li class="fragment"><p>Linear regression</p></li>
+<li class="fragment"><p>Overdispersed Poisson GLMM</p></li>
+</ol>
+</section>
+<section>
+<section id="example-1-linear-regression" class="title-slide slide level1 inverse center" data-background-color="#EB641E">
+<h1>Example 1: Linear regression</h1>
+
+</section>
+<section id="hubble-dataset" class="slide level2">
+<h2><code>Hubble</code> dataset</h2>
+<p>&nbsp;</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/hubble.csv"</span>)</span>
+<span id="cb13-2"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(d)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>'data.frame':   24 obs. of  3 variables:
+ $ Galaxy  : chr  "NGC0300" "NGC0925" "NGC1326A" "NGC1365" ...
+ $ velocity: int  133 664 1794 1594 1473 278 714 882 80 772 ...
+ $ distance: num  2 9.16 16.14 17.95 21.88 ...</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(d)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    Galaxy velocity distance
+1  NGC0300      133     2.00
+2  NGC0925      664     9.16
+3 NGC1326A     1794    16.14
+4  NGC1365     1594    17.95
+5  NGC1425     1473    21.88
+6  NGC2403      278     3.22</code></pre>
+</div>
+</div>
+</section>
+<section id="example-1-hubble-data" class="slide level2">
+<h2>Example 1: <code>Hubble</code> data</h2>
+<p>&nbsp;</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="slides_files/figure-revealjs/unnamed-chunk-16-1.png" class="margin-caption quarto-figure quarto-figure-center" width="480"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>According to the standard big-bang model, the universe expands uniformly and locally, according to Hubble’s law <span class="math display">\[ \text{velocity} = \beta \times \text{distance}\]</span></p>
+<p>where <span class="math inline">\(\beta\)</span> is the “Hubble’s constant”.</p>
+<p>According to this model <span class="math inline">\(\beta^{-1}\)</span> gives the approximate age of the universe,</p>
+</section>
+<section id="linear-model-for-hubble-data" class="slide level2">
+<h2>Linear model for Hubble data</h2>
+<p>&nbsp;</p>
+<p>We assume Gaussian measurement noise</p>
+<p><span class="math display">\[v_i = \beta d_i +\epsilon, \qquad \epsilon \sim \mathcal{N}(0, \sigma^2)\]</span></p>
+<p>No intercept needed, and <span class="math inline">\(\beta\)</span> should be positive. &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;</p>
+<div class="fragment">
+<p><strong>Prior choice</strong></p>
+<ul>
+<li class="fragment"><p><span class="math inline">\(\beta\)</span> is in units of <strong>(km/s) per Mpc</strong>; we can use a normal prior, truncated at zero <span class="math inline">\(\beta \sim \mathcal{N}(0, 200)^+\)</span></p></li>
+<li class="fragment"><p>for noise: <span class="math inline">\(\sigma \sim \mathcal{N}(0, 2000)^+\)</span></p></li>
+</ul>
+</div>
+</section>
+<section id="stan-code" class="slide level2">
+<h2>Stan code</h2>
+<p>&nbsp;</p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="sourceCode" id="cb17"><pre class="sourceCode stan code-with-copy"><code class="sourceCode stan"><span id="cb17-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> {</span>
+<span id="cb17-2"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">1</span>&gt; N;       <span class="co">// number of datapoints</span></span>
+<span id="cb17-3"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[N] distance;   <span class="co">// Mpc</span></span>
+<span id="cb17-4"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[N] velocity;   <span class="co">// km/s</span></span>
+<span id="cb17-5"><a href="" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb17-6"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">parameters</span> {</span>
+<span id="cb17-8"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; beta;   <span class="co">// km/s/Mpc, Hubble constant (slope)</span></span>
+<span id="cb17-9"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; sigma;  <span class="co">// km/s</span></span>
+<span id="cb17-10"><a href="" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb17-11"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-12"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">model</span> {</span>
+<span id="cb17-13"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="co">// weakly-informative half-normal priors via &lt;lower=0&gt;</span></span>
+<span id="cb17-14"><a href="" aria-hidden="true" tabindex="-1"></a>  beta  ~ normal(<span class="dv">0</span>, <span class="dv">200</span>);</span>
+<span id="cb17-15"><a href="" aria-hidden="true" tabindex="-1"></a>  sigma ~ normal(<span class="dv">0</span>, <span class="dv">2000</span>);</span>
+<span id="cb17-16"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-17"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="co">// likelihood</span></span>
+<span id="cb17-18"><a href="" aria-hidden="true" tabindex="-1"></a>  velocity ~ normal(beta * distance, sigma);</span>
+<span id="cb17-19"><a href="" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><div class="column" style="width:50%;">
+<div>
+<p>The code contain 3 blocks:</p>
+<ul>
+<li><p><strong>data</strong> block, in which variables are declared;</p></li>
+<li><p><strong>parameters</strong> block, in which we declare the parameters that we want to sample;</p></li>
+<li><p><strong>model</strong> block, containing the model specification (i.e.&nbsp;priors and likelihood)</p></li>
+</ul>
+</div>
+</div></div>
+<p>Saved in the text file <code>hubble_model.stan</code> in the <code>stan_code</code> folder.</p>
+</section>
+<section id="prepare-data-and-sample-from-posterior" class="slide level2">
+<h2>Prepare data and sample from posterior</h2>
+<p>Stan wants data in a list format:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="" aria-hidden="true" tabindex="-1"></a>stan_data <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb18-2"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="at">N =</span> <span class="fu">nrow</span>(d),</span>
+<span id="cb18-3"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="at">distance =</span> d<span class="sc">$</span>distance, <span class="co"># Mpc</span></span>
+<span id="cb18-4"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="at">velocity =</span> d<span class="sc">$</span>velocity  <span class="co"># km/s</span></span>
+<span id="cb18-5"><a href="" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-6"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-7"><a href="" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(stan_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>List of 3
+ $ N       : int 24
+ $ distance: num [1:24] 2 9.16 16.14 17.95 21.88 ...
+ $ velocity: int [1:24] 133 664 1794 1594 1473 278 714 882 80 772 ...</code></pre>
+</div>
+</div>
+</section>
+<section id="sample-from-posterior" class="slide level2">
+<h2>Sample from posterior</h2>
+<p>Load <code>rstan</code> library and run sampling</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rstan)</span>
+<span id="cb20-2"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="" aria-hidden="true" tabindex="-1"></a><span class="fu">rstan_options</span>(<span class="at">auto_write =</span> <span class="cn">TRUE</span>)               <span class="co"># save compiled model</span></span>
+<span id="cb20-4"><a href="" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">mc.cores =</span> parallel<span class="sc">::</span><span class="fu">detectCores</span>()<span class="sc">-</span><span class="dv">1</span>)  <span class="co"># make all cores-1 available for running parallel chains </span></span>
+<span id="cb20-5"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">stan</span>(</span>
+<span id="cb20-7"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">"stan_code/hubble_model.stan"</span>,</span>
+<span id="cb20-8"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> stan_data,</span>
+<span id="cb20-9"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter =</span> <span class="dv">2000</span>,        <span class="co"># number of iterations</span></span>
+<span id="cb20-10"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>)         <span class="co"># number of parallel chains</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="convergence-checks" class="slide level2">
+<h2>Convergence checks</h2>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb21" data-cap-location="margin"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="fu">traceplot</span>(fit, <span class="at">pars =</span> <span class="fu">c</span>(<span class="st">"beta"</span>,<span class="st">"sigma"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="slides_files/figure-revealjs/unnamed-chunk-20-1.png" class="margin-caption quarto-figure quarto-figure-center" width="576"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="fragment">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(fit, <span class="at">pars =</span> <span class="fu">c</span>(<span class="st">"beta"</span>,<span class="st">"sigma"</span>), <span class="at">probs =</span> <span class="fu">c</span>(.<span class="dv">025</span>,.<span class="dv">5</span>,.<span class="dv">975</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Inference for Stan model: anon_model.
+4 chains, each with iter=2000; warmup=1000; thin=1; 
+post-warmup draws per chain=1000, total post-warmup draws=4000.
+
+        mean se_mean    sd   2.5%    50%  97.5% n_eff Rhat
+beta   76.55    0.08  4.19  68.35  76.50  84.84  2558    1
+sigma 273.50    0.97 44.17 204.91 267.99 380.80  2092    1
+
+Samples were drawn using NUTS(diag_e) at Thu Nov  6 17:12:27 2025.
+For each parameter, n_eff is a crude measure of effective sample size,
+and Rhat is the potential scale reduction factor on split chains (at 
+convergence, Rhat=1).</code></pre>
+</div>
+</div>
+<div style="font-size: 55%;">
+<p>&nbsp;</p>
+<p>The <code>Rhat</code> ( <span class="math inline">\(\hat{R}\)</span> ) is a diagnostic index; at convergence <span class="math inline">\(\hat R \approx 1\pm0.1\)</span></p>
+<p>(essentially <span class="math inline">\(\hat R\)</span> is the ratio of between-chain to within-chain variance)</p>
+</div>
+</div>
+</section>
+<section id="posterior-samples" class="slide level2">
+<h2>Posterior samples</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidybayes)</span>
+<span id="cb24-2"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="" aria-hidden="true" tabindex="-1"></a>posterior_samples <span class="ot">&lt;-</span> fit <span class="sc">%&gt;%</span></span>
+<span id="cb24-4"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="fu">spread_draws</span>(beta) </span>
+<span id="cb24-5"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-6"><a href="" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(posterior_samples)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 4
+  .chain .iteration .draw  beta
+   &lt;int&gt;      &lt;int&gt; &lt;int&gt; &lt;dbl&gt;
+1      1          1     1  79.4
+2      1          2     2  74.8
+3      1          3     3  74.6
+4      1          4     4  81.8
+5      1          5     5  81.1
+6      1          6     6  80.8</code></pre>
+</div>
+</div>
+</section>
+<section id="posterior-for-age-of-the-universe" class="slide level2">
+<h2>Posterior for age of the universe</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="" aria-hidden="true" tabindex="-1"></a>mpc_km <span class="ot">&lt;-</span> <span class="fl">3.09e19</span> <span class="co"># km per Megaparsec</span></span>
+<span id="cb26-2"><a href="" aria-hidden="true" tabindex="-1"></a>sec_per_year <span class="ot">&lt;-</span> <span class="dv">60</span><span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> <span class="dv">24</span> <span class="sc">*</span> <span class="dv">365</span></span>
+<span id="cb26-3"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># transform in Km</span></span>
+<span id="cb26-5"><a href="" aria-hidden="true" tabindex="-1"></a>hubble.const <span class="ot">&lt;-</span> posterior_samples<span class="sc">$</span>beta<span class="sc">/</span> mpc_km </span>
+<span id="cb26-6"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-7"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># invert to get age in seconds</span></span>
+<span id="cb26-8"><a href="" aria-hidden="true" tabindex="-1"></a>age <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">/</span>hubble.const</span>
+<span id="cb26-9"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-10"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># transform age in billion years</span></span>
+<span id="cb26-11"><a href="" aria-hidden="true" tabindex="-1"></a>age <span class="ot">&lt;-</span> (age<span class="sc">/</span>sec_per_year) <span class="sc">/</span> <span class="dv">10</span><span class="sc">^</span><span class="dv">9</span></span>
+<span id="cb26-12"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-13"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># point estimate</span></span>
+<span id="cb26-14"><a href="" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(age)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 12.83895</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># 95% Bayesian credible interval</span></span>
+<span id="cb28-2"><a href="" aria-hidden="true" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> <span class="fl">0.05</span></span>
+<span id="cb28-3"><a href="" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">c</span>(<span class="fu">quantile</span>(age, <span class="at">probs =</span> alpha<span class="sc">/</span><span class="dv">2</span>),</span>
+<span id="cb28-4"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="fu">quantile</span>(age, <span class="at">probs =</span> <span class="dv">1</span><span class="sc">-</span>alpha<span class="sc">/</span><span class="dv">2</span>)),</span>
+<span id="cb28-5"><a href="" aria-hidden="true" tabindex="-1"></a>      <span class="at">digits=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> 2.5% 97.5% 
+11.55 14.34 </code></pre>
+</div>
+</div>
+</section>
+<section id="visualising-uncertainty" class="slide level2">
+<h2>Visualising uncertainty</h2>
+<p>Posterior distribution for the estimated age of the universe</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb30" data-cap-location="margin"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(age, <span class="at">breaks =</span><span class="dv">30</span>, <span class="at">xlab=</span><span class="st">"time (billions of years)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="slides_files/figure-revealjs/unnamed-chunk-25-1.png" class="margin-caption quarto-figure quarto-figure-center" width="576"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="visualising-uncertainty-1" class="slide level2">
+<h2>Visualising uncertainty</h2>
+<p>Each posterior sample correspond to a set of parameter values</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(d<span class="sc">$</span>distance, d<span class="sc">$</span>velocity, <span class="at">xlab =</span> <span class="st">"Distance (Mpc)"</span>, <span class="at">ylab =</span> <span class="st">"Velocity (km/s)"</span>)</span>
+<span id="cb31-2"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-3"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># draw 500 samples from posterior</span></span>
+<span id="cb31-4"><a href="" aria-hidden="true" tabindex="-1"></a>idx <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">seq_along</span>(posterior_samples<span class="sc">$</span>beta), <span class="dv">500</span>)</span>
+<span id="cb31-5"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-6"><a href="" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> idx){</span>
+<span id="cb31-7"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="fu">abline</span>(<span class="at">a =</span> <span class="dv">0</span>, <span class="at">b =</span> posterior_samples<span class="sc">$</span>beta[i], <span class="at">lwd =</span> <span class="dv">1</span>, <span class="at">col =</span> <span class="fu">rgb</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="fl">0.08</span>))</span>
+<span id="cb31-8"><a href="" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb31-9"><a href="" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">a =</span> <span class="dv">0</span>, <span class="at">b =</span> <span class="fu">median</span>(posterior_samples<span class="sc">$</span>beta), <span class="at">lwd =</span> <span class="dv">3</span>, <span class="at">col =</span> <span class="st">"blue"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="slides_files/figure-revealjs/unnamed-chunk-27-1.png" class="margin-caption quarto-figure quarto-figure-center" width="480"></p>
+</figure>
+</div>
+</div>
+</div>
+</section></section>
+<section>
+<section id="example-2-overdispersed-poisson-glmm" class="title-slide slide level1 inverse center" data-background-color="#EB641E">
+<h1>Example 2: Overdispersed Poisson GLMM</h1>
+
+</section>
+<section id="dataset-police-stops-in-nyc-19981999" class="slide level2">
+<h2>Dataset: police stops in NYC (1998–1999)</h2>
+<p>&nbsp;</p>
+<div>
+<ul>
+<li><p><strong>Context:</strong> Study of the NYPD <em>stop-and-frisk</em> policy, investigating possible ethnic bias in police stops.</p></li>
+<li><p><strong>Source:</strong> Records of ≈175,000 stops over 15 months (1998–1999), obtained by the New York State Attorney General’s Office.</p></li>
+<li><p><strong>Variables:</strong></p>
+<ul>
+<li><code>stops</code> — Number of police stops recorded in 1998–1999 for the cell.</li>
+<li><code>pop</code> — Estimated population size of the ethnic group within the precinct (exposure candidate).</li>
+<li><code>past.arrests</code> — Number of 1997 arrests (DCJS) for the same group/crime category (proxy for crime exposure), recorded over 1 year.</li>
+<li><code>precinct</code> — Precinct ID (integers <strong>1–75</strong>).</li>
+<li><code>eth</code> — Ethnicity code: <strong>1 = Black</strong>, <strong>2 = Hispanic</strong>, <strong>3 = White</strong>.</li>
+<li><code>crime</code> — Crime category: <strong>1 = violent</strong>, <strong>2 = weapons</strong>, <strong>3 = property</strong>, <strong>4 = drug</strong>.</li>
+</ul></li>
+<li><p><strong>Goal:</strong><br>
+Model the rate of police stops across ethnic groups and precincts, adjusting for exposure (arrests) and allowing for <em>overdispersion</em> and <em>hierarchical structure</em>.</p></li>
+</ul>
+</div>
+</section>
+<section id="summary-statistics" class="slide level2">
+<h2>Summary Statistics</h2>
+<p>&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;</p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-striped table-hover table-condensed caption-top" data-quarto-postprocess="true" style="font-size: 20px; width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>Summary of population, arrests, and police stops by ethnic group</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Ethnicity</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Population</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Stops</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Arrests</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">% of Stops</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">% of Population</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Black</td>
+<td style="text-align: right;">7463580</td>
+<td style="text-align: right;">69823</td>
+<td style="text-align: right;">125719</td>
+<td style="text-align: right;">53%</td>
+<td style="text-align: right;">28%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Hispanic</td>
+<td style="text-align: right;">6929076</td>
+<td style="text-align: right;">44623</td>
+<td style="text-align: right;">74898</td>
+<td style="text-align: right;">34%</td>
+<td style="text-align: right;">26%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">White</td>
+<td style="text-align: right;">12701416</td>
+<td style="text-align: right;">16974</td>
+<td style="text-align: right;">35922</td>
+<td style="text-align: right;">13%</td>
+<td style="text-align: right;">47%</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<aside class="notes">
+<p>Black and hispanic represented the largest fractions of stops, despite being a smaller fraction of the population. A more relevant comparison could be with respect to the number of crimes committed by each ethnicity, which however are not available. We use the pnumber of arrests as a proxy.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="confounding-by-location" class="slide level2">
+<h2>Confounding by location?</h2>
+<p>Citywise summaries could be biased if stops are mostly determined by the location</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="slides_files/figure-revealjs/unnamed-chunk-30-1.png" class="quarto-figure quarto-figure-center" width="576"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="poisson-glm-for-count-data" class="slide level2 inverse" data-background-color="#202A30">
+<h2>Poisson GLM for count data</h2>
+<p>Let <span class="math inline">\(y=(y_1, \dots, y_n)\)</span> be the outcome consisting of counts (non-negative integers), assumed to have a Poisson distribution</p>
+<p><span class="math display">\[
+y_i \sim \text{Poisson} \left(\lambda_i \right)
+\]</span> where the rate parameter <span class="math inline">\(\lambda_i\)</span> is modelled as a function of some predictor <span class="math inline">\(x\)</span></p>
+<p><span class="math display">\[
+\lambda_i = e^{\beta_0 + \beta_1 x_i}
+\]</span> The Poisson model inherently assumes that the mean is equal to the variance:</p>
+<p><span class="math display">\[ \mathbb{E}(y)=Var(y)=\lambda\]</span></p>
+<p>In practice we often observe more variability than a Poisson would allow (<strong>overdispersion</strong>).</p>
+</section>
+<section id="overdispersed-poisson-model" class="slide level2">
+<h2>Overdispersed Poisson model</h2>
+<p>&nbsp;&nbsp;</p>
+<p><span class="math display">\[y_{ep} \;\sim\; \text{Poisson}\bigl(\underbrace{\tfrac{15}{12} \times  \text{past.arrests}_{ep} }_{\text{offset term}} \;\times\; e^{\,\alpha_{e} + \beta_{p} + \epsilon_{ep}} \bigr),\]</span> where:</p>
+<div>
+<ul>
+<li><span class="math inline">\(y_{ep}\)</span> = number of stops for ethnicity <span class="math inline">\(e\)</span> in precinct <span class="math inline">\(p\)</span>.<br>
+</li>
+<li><span class="math inline">\(\alpha_{e}\)</span> = fixed effect for each ethnicity (<span class="math inline">\(e = 1,2,3\)</span>).<br>
+</li>
+<li><span class="math inline">\(\beta_{p}\)</span> = random effect for precinct <span class="math inline">\(p\)</span>, with <span class="math inline">\(\beta_p \sim N(0, \sigma_\beta^2).\)</span><br>
+</li>
+<li><span class="math inline">\(\epsilon_{ep}\)</span> = observation-level overdispersion, <span class="math inline">\(\epsilon_{ep} \sim N(0, \sigma_\epsilon^2).\)</span></li>
+</ul>
+</div>
+<p>&nbsp;&nbsp;</p>
+<p>Hence, the log-rate is: <span class="math inline">\(\log(\lambda_{ep}) = \alpha_e + \beta_p + \epsilon_{ep}\)</span>, and we multiply <span class="math inline">\(\lambda_{ep}\)</span> by the offset <span class="math inline">\(\text{past.arrests}_{ep} \times \tfrac{15}{12}\)</span>.</p>
+</section>
+<section id="priors" class="slide level2">
+<h2>Priors</h2>
+<ul>
+<li class="fragment"><p>Priors represent our initial beliefs about the plausibility of parameter values.</p></li>
+<li class="fragment"><p>Unlike likelihoods, there are no conventional priors; choice depends on context.</p></li>
+<li class="fragment"><p>Priors are subjective but should be explicitly stated for transparency and critique (more transparent than, say, dropping outliers).</p></li>
+<li class="fragment"><p>Priors are assumptions, and should be criticized (e.g.&nbsp;try different assumptions to check how sensitive inference is to the choice of priors).</p></li>
+<li class="fragment"><p>Priors cannot be exact, but should be defendable.</p></li>
+</ul>
+</section>
+<section id="priors-1" class="slide level2">
+<h2>Priors</h2>
+<ul>
+<li class="fragment"><p>There are no non-informative priors: <em>flat</em> priors such as <span class="math inline">\(\text{Uniform} \left(- \infty, \infty \right)\)</span> tells the model that unrealistic values (e.g.&nbsp;extremely large) are as plausible as realistic ones.</p></li>
+<li class="fragment"><p>Priors should restrict parameter space to values that make sense.</p></li>
+<li class="fragment"><p>Preferably choose <em>weakly informative</em> priors containg less information than what might be known (but still guide the model sensibly).</p></li>
+<li class="fragment"><p>Priors should provide some regularization, i.e.&nbsp;add some skepticism, akin to penalized likelihood methods in frequentist statistics (e.g.&nbsp;LASSO or ridge regression), preventing overfitting to data.</p></li>
+<li class="fragment"><p>Prior recommendations: <a href="https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations">https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations</a></p></li>
+<li class="fragment"><p>If using informative priors, these should be justified in the text when reporting the results (see examples in Gelman &amp; Hennig, 2016, <em>Beyond subjective and objective in statistics</em>)</p></li>
+<li class="fragment"><p>When in doubt (especially for complex models where the relationship between prior &amp; observed data is not straighforward) is always a good idea to do a <strong>prior predictive check</strong> (i.e.&nbsp;sample parameter values from the priors, use it to simulate data, and see if the overall distribution looks sensible).</p></li>
+</ul>
+</section></section>
+<section>
+<section id="a-note-on-bayes-factor" class="title-slide slide level1 inverse center" data-background-color="#EB641E">
+<h1>A note on Bayes factor</h1>
+
+</section>
+<section id="bayes-factors" class="slide level2">
+<h2>Bayes factors</h2>
+<ul>
+<li class="fragment"><p>A Bayesian approach to hypothesis testing &amp; model comparison.</p></li>
+<li class="fragment"><p>Suppose we have 2 competing models for data: model <span class="math inline">\(M_1\)</span> with parameters <span class="math inline">\(\theta_1\)</span> vs.&nbsp;model <span class="math inline">\(M_2\)</span> with parameters <span class="math inline">\(\theta_2\)</span>.</p></li>
+<li class="fragment"><p>The <strong>Bayes factor is the ratio of the marginal (average) likelihoods of the two models</strong> <span class="math display">\[\text{BF}_{1,2}=\frac{p_1(\text{data}\mid M_1)}{p_1(\text{data}\mid\ M_1)} = \frac{\int p_1(\text{data}\mid\theta_1) p_1(\theta_1) d\theta_1}{\int p_2(\text{data}\mid\theta_2) p_2(\theta_2) d\theta_2}\]</span></p></li>
+<li class="fragment"><p><strong>The Bayes factor alone does not tell which model is more likely!</strong> This is quantified by the <em>posterior odds</em>, which takes also the <em>prior odds</em> into account: <span class="math display">\[\underbrace{\frac{p(M_1 \mid \text{data})}{p(M_2 \mid \text{data})}}_{\text{posterior odds}} = \underbrace{\frac{p(M_1)}{p(M_2)}}_{\text{prior odds}} \times \underbrace{\frac{\int p_1(\text{data}\mid\theta_1) p_1(\theta_1) d\theta_1}{\int p_2(\text{data}\mid\theta_2) p_2(\theta_2) d\theta_2}}_{\text{Bayes factor}}\]</span></p></li>
+<li class="fragment"><p>The Bayes factors only tells us how much - given the data and the prior - we need to update our relative beliefs between two models.</p></li>
+<li class="fragment"><p>Say we found that <span class="math inline">\(\text{BF}_{1,2} \approx 3\)</span>, we can say that <em>‘the data are <span class="math inline">\(\approx\)</span> 3 times more likely under model 1 than model 2’</em>.</p></li>
+</ul>
+</section>
+<section id="bayes-factors-for-nested-models-the-savagedickey-density-ratio" class="slide level2">
+<h2>Bayes factors for nested models: the Savage–Dickey density ratio</h2>
+<p>&nbsp;&nbsp;</p>
+<div>
+<p>When the two models are <em>nested</em> (e.g.&nbsp;the <span class="math inline">\(M_1\)</span> is a special case of <span class="math inline">\(M_2\)</span> in which which one specific parameter is set to zero - corresponding to the null hypothesis in classical NHST framework), the Bayes factor can be obtained by <em>dividing the height of the posterior by the height of the prior at the point of interest</em> (Dickey &amp; Lientz, 1970)</p>
+</div>
+<p>&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;</p>
+<div class="fragment">
+<p>Left plot: <span class="math inline">\(BF_{0,1} \approx 2\)</span>; and right plot <span class="math inline">\(BF_{0,1} \approx \frac{1}{2}\)</span> (thus implying <span class="math inline">\(BF_{1,0} \approx 2\)</span>)</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="slides_files/figure-revealjs/unnamed-chunk-32-1.svg" class="quarto-figure quarto-figure-center" style="width:70.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<div style="font-size: 55%;">
+<p>(see <code>savage.dickey.bf()</code> function in <a href="https://github.com/mattelisi/mlisi"><code>mlisi</code> package</a>)</p>
+</div>
+</div>
+</section>
+<section id="cautionary-note-about-bayes-factors" class="slide level2">
+<h2>Cautionary note about Bayes factors</h2>
+<ul>
+<li class="fragment"><p>Bayes factors represents the update in beliefs from prior to posterior, and therefore are strongly dependent on the prior used.</p></li>
+<li class="fragment"><p>Bayes factors are <em>“(…) very sensitive to features of the prior that have almost no effect on the posterior. With hundreds of data points, the difference between a normal(0, 1) and normal(0, 100) prior is negligible if the true value is in the range (-3, 3), but it can have a huge effect on Bayes factors.”</em> (Bob Carpenter, <a href="https://statmodeling.stat.columbia.edu/2023/10/14/bayes-factors-prior-cross-validation-posterior/">post link</a>)</p></li>
+<li class="fragment"><p>Bayes factors makes sense only if you have good reasons for selecting a particular prior!</p></li>
+<li class="fragment"><p>If not, other approaches may be preferable - e.g.&nbsp;Bayesian cross-validation, and information criteria like WAIC.</p></li>
+<li class="fragment"><p>Never trust a paper that just throws Bayes factors there without specifying and motivating the priors!</p></li>
+</ul>
+</section>
+<section id="references" class="slide level2">
+<h2>References</h2>
+<div>
+<div style="font-size: 55%;">
+<ul>
+<li><p>Wood, Simon. <em>Generalized Additive Models: An Introduction with R.</em> 2nd ed.&nbsp;Chapman &amp; Hall/CRC Press, 2017. <a href="https://doi.org/10.1201/9781315370279">https://doi.org/10.1201/9781315370279</a>.</p></li>
+<li><p>Gelman, Andrew, and Jennifer Hill. <em>Data Analysis Using Regression and Multilevel/Hierarchical Models.</em> 2007.</p></li>
+</ul>
+</div>
+</div>
+<div class="quarto-auto-generated-content">
+<p><img src="img/logo-small-london-cmyk.jpg" class="slide-logo"></p>
+<div class="footer footer-default">
+<p>#StandWithUkraine</p>
+</div>
+</div>
+</section></section>
+    </div>
+  </div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="slides_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="slides_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: false,
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
+    <script id="quarto-html-after-body" type="application/javascript">
+    window.document.addEventListener("DOMContentLoaded", function (event) {
+      const toggleBodyColorMode = (bsSheetEl) => {
+        const mode = bsSheetEl.getAttribute("data-mode");
+        const bodyEl = window.document.querySelector("body");
+        if (mode === "dark") {
+          bodyEl.classList.add("quarto-dark");
+          bodyEl.classList.remove("quarto-light");
+        } else {
+          bodyEl.classList.add("quarto-light");
+          bodyEl.classList.remove("quarto-dark");
+        }
+      }
+      const toggleBodyColorPrimary = () => {
+        const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+        if (bsSheetEl) {
+          toggleBodyColorMode(bsSheetEl);
+        }
+      }
+      toggleBodyColorPrimary();  
+      const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+      tabsets.forEach(function(tabset) {
+        const tabby = new Tabby('#' + tabset.id);
+      });
+      const isCodeAnnotation = (el) => {
+        for (const clz of el.classList) {
+          if (clz.startsWith('code-annotation-')) {                     
+            return true;
+          }
+        }
+        return false;
+      }
+      const onCopySuccess = function(e) {
+        // button target
+        const button = e.trigger;
+        // don't keep focus
+        button.blur();
+        // flash "checked"
+        button.classList.add('code-copy-button-checked');
+        var currentTitle = button.getAttribute("title");
+        button.setAttribute("title", "Copied!");
+        let tooltip;
+        if (window.bootstrap) {
+          button.setAttribute("data-bs-toggle", "tooltip");
+          button.setAttribute("data-bs-placement", "left");
+          button.setAttribute("data-bs-title", "Copied!");
+          tooltip = new bootstrap.Tooltip(button, 
+            { trigger: "manual", 
+              customClass: "code-copy-button-tooltip",
+              offset: [0, -8]});
+          tooltip.show();    
+        }
+        setTimeout(function() {
+          if (tooltip) {
+            tooltip.hide();
+            button.removeAttribute("data-bs-title");
+            button.removeAttribute("data-bs-toggle");
+            button.removeAttribute("data-bs-placement");
+          }
+          button.setAttribute("title", currentTitle);
+          button.classList.remove('code-copy-button-checked');
+        }, 1000);
+        // clear code selection
+        e.clearSelection();
+      }
+      const getTextToCopy = function(trigger) {
+          const codeEl = trigger.previousElementSibling.cloneNode(true);
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+      }
+      const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+        text: getTextToCopy
+      });
+      clipboard.on('success', onCopySuccess);
+      if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+        // For code content inside modals, clipBoardJS needs to be initialized with a container option
+        // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+        const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+          text: getTextToCopy,
+          container: window.document.getElementById('quarto-embedded-source-code-modal')
+        });
+        clipboardModal.on('success', onCopySuccess);
+      }
+        var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+        var mailtoRegex = new RegExp(/^mailto:/);
+          var filterRegex = new RegExp('/' + window.location.host + '/');
+        var isInternal = (href) => {
+            return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+        }
+        // Inspect non-navigation links and adorn them if external
+     	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+        for (var i=0; i<links.length; i++) {
+          const link = links[i];
+          if (!isInternal(link.href)) {
+            // undo the damage that might have been done by quarto-nav.js in the case of
+            // links that we want to consider external
+            if (link.dataset.originalHref !== undefined) {
+              link.href = link.dataset.originalHref;
+            }
+          }
+        }
+      function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+        const config = {
+          allowHTML: true,
+          maxWidth: 500,
+          delay: 100,
+          arrow: false,
+          appendTo: function(el) {
+              return el.closest('section.slide') || el.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'light-border',
+          placement: 'bottom-start',
+        };
+        if (contentFn) {
+          config.content = contentFn;
+        }
+        if (onTriggerFn) {
+          config.onTrigger = onTriggerFn;
+        }
+        if (onUntriggerFn) {
+          config.onUntrigger = onUntriggerFn;
+        }
+          config['offset'] = [0,0];
+          config['maxWidth'] = 700;
+        window.tippy(el, config); 
+      }
+      const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+      for (var i=0; i<noterefs.length; i++) {
+        const ref = noterefs[i];
+        tippyHover(ref, function() {
+          // use id or data attribute instead here
+          let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+          try { href = new URL(href).hash; } catch {}
+          const id = href.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note) {
+            return note.innerHTML;
+          } else {
+            return "";
+          }
+        });
+      }
+      const findCites = (el) => {
+        const parentEl = el.parentElement;
+        if (parentEl) {
+          const cites = parentEl.dataset.cites;
+          if (cites) {
+            return {
+              el,
+              cites: cites.split(' ')
+            };
+          } else {
+            return findCites(el.parentElement)
+          }
+        } else {
+          return undefined;
+        }
+      };
+      var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+      for (var i=0; i<bibliorefs.length; i++) {
+        const ref = bibliorefs[i];
+        const citeInfo = findCites(ref);
+        if (citeInfo) {
+          tippyHover(citeInfo.el, function() {
+            var popup = window.document.createElement('div');
+            citeInfo.cites.forEach(function(cite) {
+              var citeDiv = window.document.createElement('div');
+              citeDiv.classList.add('hanging-indent');
+              citeDiv.classList.add('csl-entry');
+              var biblioDiv = window.document.getElementById('ref-' + cite);
+              if (biblioDiv) {
+                citeDiv.innerHTML = biblioDiv.innerHTML;
+              }
+              popup.appendChild(citeDiv);
+            });
+            return popup.innerHTML;
+          });
+        }
+      }
+    });
+    </script>
+    
+
+</body></html>
