@@ -7,5 +7,7 @@ This repository hosts the materials for the [**Building and Customising Statisti
 - [**Worksheet (HTML)**](worksheet.html)
 - [**Source code & data (GitHub)**](https://github.com/mattelisi/bayes-workshop)
 
+(R packages used in the workshop: `rstan`, `tidyverse`, `tidybayes`.)
+
 Author: Matteo Lisi
 matteo.lisi (at) rhul.ac.uk
